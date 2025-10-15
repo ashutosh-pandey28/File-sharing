@@ -12,6 +12,10 @@ urlpatterns = [
 ]
 
 if settings.DEBUG:
+    # This serves files uploaded by users (media files)
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    
+    # This serves your static files (CSS, JavaScript, images)
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 urlpatterns += staticfiles_urlpatterns()
