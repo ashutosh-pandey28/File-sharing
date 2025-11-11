@@ -70,40 +70,32 @@ DATABASES = {
 }
 
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',},
 ]
 
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
 USE_I18N = USE_L10N = USE_TZ = True
 
-# ✅STATIC FILES (Render compatible)
+# ✅ STATIC FILES (your static folder is inside public/)
 STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATIC_ROOT = BASE_DIR / 'staticfiles'   # where collectstatic will store final files
 
 STATICFILES_DIRS = [
-    BASE_DIR / 'public/static',
+    BASE_DIR / 'public/static',  # your source static folder
 ]
 
-# ✅MEDIA FILES (Corrected — your version was wrong)
+# ✅ MEDIA FILES (uploaded content)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-# Create media folder if missing
+# Ensure the media folder exists
 os.makedirs(MEDIA_ROOT, exist_ok=True)
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# ✅Allow large file uploads (10GB)
+# ✅ Allow large uploads (10 GB)
 DATA_UPLOAD_MAX_MEMORY_SIZE = 10485760000

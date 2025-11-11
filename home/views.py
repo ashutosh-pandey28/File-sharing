@@ -17,7 +17,7 @@ def handle_upload(request):
     if not files:
         return JsonResponse({'status': 400, 'message': 'No files uploaded'})
 
-    # Correct upload folder
+    # Upload folder
     folder_name = 'uploads'
     upload_path = os.path.join(settings.MEDIA_ROOT, folder_name)
     os.makedirs(upload_path, exist_ok=True)
@@ -28,20 +28,22 @@ def handle_upload(request):
             for chunk in file.chunks():
                 destination.write(chunk)
 
-    # Create ZIP file
+    # ZIP folder path
     zip_folder = os.path.join(settings.MEDIA_ROOT, 'downloads')
     os.makedirs(zip_folder, exist_ok=True)
 
-    zip_path = os.path.join(zip_folder, f"{folder_name}.zip")
+    zip_name = f"{folder_name}.zip"
+    zip_path = os.path.join(zip_folder, zip_name)
 
+    # Create ZIP
     with zipfile.ZipFile(zip_path, 'w') as zipf:
         for file in files:
             file_path = os.path.join(upload_path, file.name)
             zipf.write(file_path, arcname=file.name)
 
-    # Generate proper download URL using reverse()
+    # ✅ FIX: Absolute URL for BOTH local + deployment
     download_url = request.build_absolute_uri(
-        reverse('download_zip', args=[f"{folder_name}.zip"])
+        reverse('download_zip', args=[zip_name])
     )
 
     return JsonResponse({
@@ -60,8 +62,9 @@ def download_zip(request, filename):
     if not os.path.exists(zip_path):
         raise Http404("ZIP file not found")
 
+    # ✅ FIX: File download works directly, not redirecting
     return FileResponse(open(zip_path, 'rb'), as_attachment=True)
-    
+
 
 def home(request):
     return render(request, 'home.html')
