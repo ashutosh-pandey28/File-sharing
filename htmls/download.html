@@ -127,12 +127,19 @@
     });
 
     function downloadFiles() {
-      if (!downloadUrl) {
+    if (!downloadUrl) {
         alert("Please upload files first.");
         return;
-      }
-      window.location.href = downloadUrl;   
     }
+
+    const a = document.createElement('a');
+    a.href = downloadUrl;
+    a.download = "";  
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+}
+
   </script>
 
 </body>
