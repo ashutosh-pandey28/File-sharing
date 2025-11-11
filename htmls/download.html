@@ -105,25 +105,34 @@
   <script src="https://unpkg.com/jquery-filepond/filepond.jquery.js"></script>
   <script src="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.js"></script>
 
-  <script>
-    // Register FilePond plugins
+ <script>
     FilePond.registerPlugin(FilePondPluginImagePreview);
 
-    // Turn all file input elements into ponds
-    FilePond.create(document.querySelector('.my-pond'));
+    let downloadUrl = null;
+
+    // ✅ Minimal FilePond config to connect with Django
+    $('.my-pond').filepond({
+      allowMultiple: true,
+      server: {
+        process: {
+          url: "/upload/",
+          method: "POST",
+          onload: function(response) {
+            const res = JSON.parse(response);
+            downloadUrl = res.data.download_url;   // ✅ ZIP URL from Django
+            return response;
+          }
+        }
+      }
+    });
 
     function downloadFiles() {
-      // Define the logic to download files here
-      console.log('Download files function called.');
+      if (!downloadUrl) {
+        alert("Please upload files first.");
+        return;
+      }
+      window.location.href = downloadUrl;   
     }
-
-    $(function () {
-      $('.my-pond').filepond();
-      $('.my-pond').filepond('allowMultiple', true);
-      $('.my-pond').on('FilePond:addfile', function (e) {
-        console.log('file added event', e);
-      });
-    });
   </script>
 
 </body>

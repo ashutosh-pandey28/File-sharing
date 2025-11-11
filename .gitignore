@@ -32,3 +32,13 @@ Thumbs.db
 *.opensdf
 *.cache
 *.pydevproject
+# Ignore large and media files
+*.zip
+*.mp4
+*.avi
+*.rar
+*.exe
+*.iso
+/media/
+/public/static/media/
+/staticfiles/
