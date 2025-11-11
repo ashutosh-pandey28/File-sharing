@@ -28,7 +28,7 @@ DEBUG = True
 ALLOWED_HOSTS = [
     'file-share-1-ukpq.onrender.com',  # Existing
     'file-share-2-njko.onrender.com',
-    'file-share-3-fxgk.onrender.com' # New
+    'file-sharing-5s8f.onrender.com',  
     'localhost',
     '127.0.0.1'
 ]
