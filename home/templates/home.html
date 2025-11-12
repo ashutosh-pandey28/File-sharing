@@ -121,7 +121,8 @@
     <div class="container">
       <div class="upload-card">
         <h2>Upload and Download Files</h2>
-        <img src="/static/undraw.svg" class="download-icon" alt="Icon">
+        <img src="{% static 'home/undraw.svg' %}" class="download-icon" alt="Icon">
+
 
         <input type="file" class="my-pond" multiple name="filepond" />
         <div class="mt-4">
@@ -215,74 +216,95 @@
       });
 
       FilePond.registerPlugin(FilePondPluginImagePreview);
-
-      const pond = FilePond.create(document.querySelector(".my-pond"));
-      pond.allowMultiple = true;
+      const pond = FilePond.create(document.querySelector(".my-pond"), { allowMultiple: true });
 
       let downloadUrl = null;
 
+      function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== "") {
+          const cookies = document.cookie.split(";");
+          for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === name + "=") {
+              cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+              break;
+            }
+          }
+        }
+        return cookieValue;
+      }
+
       function upload_file() {
         const files = pond.getFiles();
-        const formdata = new FormData();
-        files.forEach((fileItem) => {
-          formdata.append("files", fileItem.file);
-        });
+        if (!files.length) {
+          alert("Please select a file first!");
+          return;
+        }
 
+        const formdata = new FormData();
+        files.forEach((f) => formdata.append("files", f.file));
+      
         const xhr = new XMLHttpRequest();
         xhr.open("POST", "/handle/", true);
-        xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
-
+        xhr.setRequestHeader("X-CSRFToken", getCookie("csrftoken"));
+      
         xhr.upload.onprogress = function (e) {
-          const percentComplete = (e.loaded / e.total) * 100;
+          const percent = (e.loaded / e.total) * 100;
           document.getElementById("progress-bar").style.display = "block";
-          document.getElementById("progress-bar-fill").style.width =
-            percentComplete + "%";
-          document.getElementById("progress-bar-fill").innerText =
-            Math.round(percentComplete) + "%";
+          document.getElementById("progress-bar-fill").style.width = percent + "%";
+          document.getElementById("progress-bar-fill").innerText = Math.round(percent) + "%";
         };
 
         xhr.onload = function () {
           if (xhr.status === 200) {
             const result = JSON.parse(xhr.responseText);
             if (result.status === 200) {
-              downloadUrl = `http://127.0.0.1:8000/media/downloads/${result.data.folder}.zip`;
+              if (result.data?.file_url) {
+                downloadUrl = result.data.file_url;
+              } else if (result.data?.folder) {   
+                downloadUrl = `/media/downloads/${result.data.folder}.zip`;
+              } else {
+                alert("Invalid response format. No download path provided.");
+                return;
+              }
+
               document.getElementById("download-link").href = downloadUrl;
               document.getElementById("btn").style.display = "block";
             } else {
-              alert(result.message);
+              alert(result.message || "Upload failed on server.");
             }
           } else {
             alert("An error occurred while uploading the file.");
           }
-        };
+      };
 
-        xhr.send(formdata);
-      }
+    xhr.send(formdata);
+  }
 
-      function copyClip() {
+  function copyClip() {
         if (downloadUrl) {
           navigator.clipboard
-            .writeText(downloadUrl)
-            .then(() => {
-              alert(`Copied the download link: ${downloadUrl}`);
-            })
-            .catch((err) => {
-              console.error("Failed to copy: ", err);
-            });
+            .writeText(window.location.origin + downloadUrl)
+            .then(() => alert(`Copied: ${window.location.origin + downloadUrl}`))
+            .catch((err) => console.error("Failed to copy:", err));
         } else {
-          alert("Download URL not available");
+          alert("No download URL available.");
         }
-      }
+  }   
 
-      document
-        .getElementById("download-link")
-        .addEventListener("click", function (e) {
-          e.preventDefault();
-          const link = document.createElement("a");
-          link.href = downloadUrl;
-          link.download = true;
-          link.click();
-        });
+  document.getElementById("download-link").addEventListener("click", function (e) {
+        e.preventDefault();
+        if (!downloadUrl) return alert("No file to download yet!");
+        const link = document.createElement("a");
+        link.href = downloadUrl;
+        link.download = "";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      });
+
+
     </script>
   </body>
 </html>
