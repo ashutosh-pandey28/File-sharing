@@ -85,7 +85,7 @@ STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'   # where collectstatic will store final files
 
 STATICFILES_DIRS = [
-    BASE_DIR / 'public/static',  # your source static folder
+    BASE_DIR / 'home'/'static',  # your source static folder
 ]
 
 # ✅ MEDIA FILES (uploaded content)
